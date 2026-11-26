@@ -1,0 +1,44 @@
+# Nova fleet tracking — base configuration.
+# Values here are overridden at runtime by environment variables
+# (e.g. NOVA_KAFKA_BOOTSTRAP_SERVERS, NOVA_KAFKA_GROUP_ID, NOVA_LOG_LEVEL).
+
+kafka:
+  bootstrap_servers: localhost:9092
+  topics:
+    raw: fleet.telemetry.raw
+    processed: fleet.telemetry.processed
+    alerts: fleet.alerts
+    dlq: fleet.telemetry.dlq
+  group_id: nova-processor
+  # Security placeholders — inject real secrets via the environment.
+  security:
+    protocol: SASL_PLAINTEXT
+    mechanism: SCRAM-SHA-512
+    username: null
+    password: null
+    ca_file: null
+
+# Trip detection settings.
+trips:
+  idle_timeout_s: 300
+  max_trips_per_vehicle: 1000
+
+# Rule thresholds for maintenance alerts.
+thresholds:
+  fuel_pct_min: 15
+  coolant_temp_c_max: 105
+  oil_pressure_kpa_min: 150
+
+# Geofence definitions for enter/exit alerts.
+geofences:
+  - name: depot
+    shape: circle
+    center_lat: 37.7749
+    center_lon: -122.4194
+    radius_m: 500
+  - name: downtown
+    shape: polygon
+    points:
+      - [37.78, -122.42]
+      - [37.79, -122.40]
+      - [37.77, -122.39]
